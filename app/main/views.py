@@ -12,15 +12,15 @@ def index():
 
     # 在没有任何数据的时候，添加第一个创始人
     if Student.query.count() == 0:
-        team = Team(leader='wangshenhua')
-        student = Student(name='wangshenhua',
-                          role='leader',
-                          referrer='wangshenhua'
+        team = Team(leader='王申华')
+        student = Student(name='王申华',
+                          role='团队领导',
+                          referrer='王申华'
                           )
         student.team = team
         db.session.add(student)
         db.session.commit()
-        flash('you have inited the first partner.')
+        flash('已经初始化了创始人.')
 
     # 删除所有人
     # if Team.query.count() != 0:
@@ -46,7 +46,7 @@ def index():
         referrer_referrer = Student.query.filter_by(name=referrer.referrer).first()
         # 判断引荐人是否存在，不存在报错返回到原始页面
         if referrer is None:
-            flash('the referrer not exist! 引荐人不存在！请输入正确的引荐人名字！')
+            flash('引荐人不存在！请输入正确的引荐人名字！')
             return redirect(url_for('main.index'))
         # 考虑引荐人是自己的情况
 
@@ -60,21 +60,21 @@ def index():
         db.session.add(student)
         db.session.commit()
         # 判断学员引荐人是否提升为合伙人（partner）
-        if referrer.name != 'wangshenhua' and Student.query.filter_by(referrer=referrer.name).count() == 2:
-            referrer.role = 'partner'
+        if referrer.name != '王申华' and Student.query.filter_by(referrer=referrer.name).count() == 2:
+            referrer.role = '合伙人'
             session['referrer_name'] = referrer.name
             db.session.add(referrer)
             db.session.commit()
             session['referrer_yes'] = True
         # 判断引荐人的引荐人是否提升为团队领导（leader）
-        if referrer.name != 'wangshenhua' and \
-                Student.query.filter_by(referrer=referrer_referrer.name, role='partner').count() == 2 and \
-                referrer_referrer.role != 'leader':
-            referrer_referrer.role = 'leader'
+        if referrer.name != '王申华' and \
+                Student.query.filter_by(referrer=referrer_referrer.name, role='合伙人').count() == 2 and \
+                referrer_referrer.role != '团队领导':
+            referrer_referrer.role = '团队领导'
             session['referrer_referrer_name'] = referrer_referrer.name
             team = Team(leader=referrer_referrer.name)
             if team:
-                flash('team has been added.')
+                flash('新增了一个团队.')
             db.session.add(team)
 
             # 定义递归调用，遍历某个team_leader_name领导的团队下的所有的成员，并将其团队更改为他的团队
@@ -84,7 +84,7 @@ def index():
                 for team_member in team_members:
                     team_member.team = team
                     db.session.add(team_member)
-                    flash('team changed...')
+                    # flash('team changed...')
                     member = Student.query.filter_by(referrer=team_member.name).count()
                     if member != 0:
                         traversal_members(team_member.name)
@@ -117,7 +117,7 @@ def query_student():
         student = Student.query.filter_by(name=form.name.data).first()
         session['member_count'] = 0
         if student is None:
-            flash('The student not exist.')
+            flash('此学员不存在.')
             return redirect(url_for('main.query_student'))
 
         def calculate_member_count(student, member_count=0):
@@ -139,9 +139,18 @@ def query_team():
     if form.validate_on_submit():
         team = Team.query.filter_by(leader=form.leader.data).first()
         if team is None:
-            flash('The team not exist.')
-        partner_number = Student.query.filter_by(team=team).filter_by(role='partner').count()
-        # partner_number = team.students.query.filter_by(role='partner').count()
-        student_number = Student.query.filter_by(team=team).count()
-        return render_template('query-team.html', form=form, team=team, partner_number=partner_number, student_number=student_number)
+            flash('此团队不存在.')
+        partners = Student.query.filter_by(team=team).filter_by(role='合伙人').all()
+        students = Student.query.filter_by(team=team).all()
+        partner_number = len(partners)
+        student_number = len(students)
+        # partner_number = Student.query.filter_by(team=team).filter_by(role='合伙人').count()
+        # student_number = Student.query.filter_by(team=team).count()
+        return render_template('query-team.html',
+                               form=form,
+                               team=team,
+                               partners=partners,
+                               students=students,
+                               partner_number=partner_number,
+                               student_number=student_number)
     return render_template('query-team.html', form=form)

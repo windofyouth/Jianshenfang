@@ -7,13 +7,13 @@
 </div>
 <div class="page-header" xmlns="http://www.w3.org/1999/html">
     {% if student_name %}
-    <H1>{{student_name}} is added successfully!</H1>
+    <H1>{{student_name}} 添加成功!</H1>
     {% endif %}
     {% if referrer_name %}
-    <H2>{{referrer_name}} changed to partner!</H2>
+    <H2>{{referrer_name}} 变成了合伙人!</H2>
     {% endif %}
     {% if referrer_referrer_name %}
-    <H3>{{referrer_referrer_name}} changed to leader!</H3>
+    <H3>{{referrer_referrer_name}} 变成了团队领导!</H3>
     {% endif %}
     <ul>
     {% for team_member in team_members %}

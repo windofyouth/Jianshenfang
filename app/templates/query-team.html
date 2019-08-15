@@ -17,7 +17,20 @@
     {{ wtf.quick_form(form) }}
 </div>
 <div>
-    <ul>partner number : {{partner_number}}</ul>
-    <ul>student number: {{student_number}}</ul>
+    <ul>合伙人数量 : {{partner_number}}</ul>
+    <ul>学员数量: {{student_number}}</ul>
+</div>
+<div>
+    {% if partner_number %}
+        {% for partner in partners %}
+            <ul> 合伙人：{{partner.name}}</ul>
+        {% endfor %}
+    {% endif %}
+
+    {% if student_number %}
+        {% for student in students %}
+            <ul> 学员：{{student.name}}</ul>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

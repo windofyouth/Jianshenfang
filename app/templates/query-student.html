@@ -18,13 +18,14 @@
 </div>
 <div>
     {% if a %}
-        <ul>name:{{student.name}}</ul>
-        <ul>team:{{student.team.leader}}</ul>
-        <ul>role:{{student.role}}</ul>
-        <ul>number:{{a}}</ul>
-        <ul>time:{{student.timestamp}}</ul>
+        <ul>学员姓名:{{student.name}}</ul>
+        <ul>团队领导:{{student.team.leader}}</ul>
+        <ul>引荐人:{{student.referrer}}</ul>
+        <ul>学员角色:{{student.role}}</ul>
+        <ul>学员数量:{{a}}</ul>
+        <ul>加入时间:{{student.timestamp}}</ul>
     {% else %}
-        the number is 0
+        该学员没有引荐任何人
     {% endif %}
 </div>
 {% endblock %}
