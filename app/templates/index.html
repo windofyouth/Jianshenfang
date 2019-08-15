@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div>
+    {{ wtf.quick_form(form) }}
+</div>
+<div class="page-header" xmlns="http://www.w3.org/1999/html">
+    {% if student_name %}
+    <H1>{{student_name}} is added successfully!</H1>
+    {% endif %}
+    {% if referrer_name %}
+    <H2>{{referrer_name}} changed to partner!</H2>
+    {% endif %}
+    {% if referrer_referrer_name %}
+    <H3>{{referrer_referrer_name}} changed to leader!</H3>
+    {% endif %}
+    <ul>
+    {% for team_member in team_members %}
+        <li>{{team_member.name}}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
