@@ -2,30 +2,24 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-<!--<div class="page-header">-->
-    <!--{% if student %}-->
-    <!--<H1>{{student.name}} is added successfully!</H1>-->
-    <!--{% endif %}-->
-    <!--{% if referrer_yes %}-->
-    <!--<H2>{{referrer.name}} changed to partner!</H2>-->
-    <!--{% endif %}-->
-    <!--{% if referrer_referrer_yes %}-->
-    <!--<H3>{{referrer_referrer.name}} changed to leader!</H3>-->
-    <!--{% endif %}-->
-<!--</div>-->
+<h1>查询学员信息</h1>
 <div>
     {{ wtf.quick_form(form) }}
 </div>
 <div>
-    {% if a %}
-        <ul>学员姓名:{{student.name}}</ul>
+    {% if student %}
+        <ul><a href="{{url_for('.change_name', name=student.name) }}">学员姓名:{{student.name}}</a></ul>
         <ul>团队领导:{{student.team.leader}}</ul>
         <ul>引荐人:{{student.referrer}}</ul>
         <ul>学员角色:{{student.role}}</ul>
-        <ul>学员数量:{{a}}</ul>
         <ul>加入时间:{{student.timestamp}}</ul>
-    {% else %}
-        该学员没有引荐任何人
+        {% if a %}
+        <ul>引荐学员数量:{{a}}</ul>
+        {% else %}
+        <ul>引荐学员数量: 0</ul>
+        {% endif %}
     {% endif %}
+
+
 </div>
 {% endblock %}

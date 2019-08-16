@@ -1,4 +1,4 @@
-from .forms import AddStudentForm, QueryStudentForm, QueryTeamForm
+from .forms import AddStudentForm, QueryStudentForm, QueryTeamForm, ChangeStudentNameForm
 from . import main
 from ..models import Student, Team
 from flask import flash, render_template, redirect, url_for, session
@@ -104,7 +104,7 @@ def index():
                            form=form,
                            referrer_yes=session.get('referrer_yes'),
                            referrer_referrer_yes=session.get('referrer_referrer_yes'),
-                           student_name = session.get('student_name'),
+                           student_name=session.get('student_name'),
                            referrer_name=session.get('referrer_name'),
                            referrer_referrer_name=session.get('referrer_referrer_name')
                            )
@@ -154,3 +154,26 @@ def query_team():
                                partner_number=partner_number,
                                student_number=student_number)
     return render_template('query-team.html', form=form)
+
+
+@main.route('/change-name/<name>', methods=['GET', 'POST'])
+def change_name(name):
+    form = ChangeStudentNameForm()
+    if form.validate_on_submit():
+        student = Student.query.filter_by(name=name).first()
+        if student is None:
+            return redirect(url_for('main.index'))
+        student.name = form.name.data
+        db.session.add(student)
+        if student.role == '团队领导':
+            team = Team.query.filter_by(leader=name).first()
+            team.leader = student.name
+            db.session.add(team)
+        students = Student.query.filter_by(referrer=name).all()
+        for user in students:
+            user.referrer = student.name
+            db.session.add(user)
+        db.session.commit()
+        flash('修改成功！')
+    form.name.data = name
+    return render_template('change-name.html', form=form, name=name)

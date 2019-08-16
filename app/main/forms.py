@@ -34,3 +34,12 @@ class QueryTeamForm(FlaskForm):
     leader = StringField('团队领导姓名', validators=[DataRequired(), Length(1, 64)])
     submit = SubmitField('提交')
 
+
+class ChangeStudentNameForm(FlaskForm):
+    name = StringField('姓名', validators=[DataRequired(), Length(1, 64)])
+    submit = SubmitField('修改')
+
+    def validate_name(self, field):
+        if Student.query.filter_by(name=field.data).first():
+            raise ValidationError('此姓名已经存在')
+
