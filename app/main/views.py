@@ -3,6 +3,7 @@ from . import main
 from ..models import Student, Team
 from flask import flash, render_template, redirect, url_for, session
 from .. import db
+from datetime import datetime, timedelta
 from sqlalchemy import or_
 
 
@@ -60,7 +61,10 @@ def index():
         db.session.add(student)
         db.session.commit()
         # 判断学员引荐人是否提升为合伙人（partner）
-        if referrer.name != '王申华' and Student.query.filter_by(referrer=referrer.name).count() == 2:
+        threemonthtime = student.timestamp - timedelta(hours=1)
+        if referrer.name != '王申华' and \
+                Student.query.filter(Student.referrer == referrer.name,
+                                     Student.timestamp > threemonthtime).count() == 3:
             referrer.role = '合伙人'
             session['referrer_name'] = referrer.name
             db.session.add(referrer)

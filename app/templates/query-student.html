@@ -12,7 +12,7 @@
         <ul>团队领导:{{student.team.leader}}</ul>
         <ul>引荐人:{{student.referrer}}</ul>
         <ul>学员角色:{{student.role}}</ul>
-        <ul>加入时间:{{student.timestamp}}</ul>
+        <ul>加入时间:{{moment(student.timestamp).format('LLL')}}</ul>
         {% if a %}
         <ul>引荐学员数量:{{a}}</ul>
         {% else %}
