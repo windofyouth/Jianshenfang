@@ -9,10 +9,15 @@
 <div>
     {% if student %}
         <ul><a href="{{url_for('.change_name', name=student.name) }}">学员姓名:{{student.name}}</a></ul>
-        <ul>团队领导:{{student.team.leader}}</ul>
         <ul>引荐人:{{student.referrer}}</ul>
+        {% if student_partner %}
+        <ul>合伙人:{{student_partner}}</ul>
+        {% else %}
+        <ul>合伙人:该学员上级没有合伙人</ul>
+        {% endif %}
+        <ul>团队领导:{{student.team.leader}}</ul>
         <ul>学员角色:{{student.role}}</ul>
-        <ul>加入时间:{{moment(student.timestamp).format('LLL')}}</ul>
+        <ul>加入时间:{{moment(student.timestamp).format('YYYY-MM-DD')}}</ul>
         {% if a %}
         <ul>引荐学员数量:{{a}}</ul>
         {% else %}

@@ -7,8 +7,14 @@ from datetime import datetime, timedelta
 from sqlalchemy import or_
 
 
-@main.route('/', methods=['GET', 'POST'])
+@main.route('/')
 def index():
+    teams = Team.query.all()
+    return render_template('index.html', teams=teams)
+
+
+@main.route('/add-student', methods=['GET', 'POST'])
+def add_student():
     form = AddStudentForm()
 
     # 在没有任何数据的时候，添加第一个创始人
@@ -48,7 +54,7 @@ def index():
         # 判断引荐人是否存在，不存在报错返回到原始页面
         if referrer is None:
             flash('引荐人不存在！请输入正确的引荐人名字！')
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.add_student'))
         # 考虑引荐人是自己的情况
 
         # 添加学员
@@ -61,6 +67,7 @@ def index():
         db.session.add(student)
         db.session.commit()
         # 判断学员引荐人是否提升为合伙人（partner）
+        # 设置时间，在此时间内引荐足够的人数成为合伙人
         threemonthtime = student.timestamp - timedelta(hours=1)
         if referrer.name != '王申华' and \
                 Student.query.filter(Student.referrer == referrer.name,
@@ -103,8 +110,8 @@ def index():
         #                        referrer_yes=referrer_yes,
         #                        referrer_referrer_yes=referrer_referrer_yes,
         #                        )
-        return redirect(url_for('main.index'))
-    return render_template('index.html',
+        return redirect(url_for('main.add_student'))
+    return render_template('add-student.html',
                            form=form,
                            referrer_yes=session.get('referrer_yes'),
                            referrer_referrer_yes=session.get('referrer_referrer_yes'),
@@ -124,6 +131,7 @@ def query_student():
             flash('此学员不存在.')
             return redirect(url_for('main.query_student'))
 
+        # 定义递归函数，计算一个在学员下的成员数量
         def calculate_member_count(student, member_count=0):
             query = Student.query.filter_by(referrer=student.name)
             students = query.all()
@@ -131,9 +139,22 @@ def query_student():
                 session['member_count'] = session['member_count'] + query.count()
                 for student in students:
                     calculate_member_count(student, member_count=member_count)
+        if student.name == '王申华':
+            session['member_count'] = Student.query.count() - 1
+        else:
+            calculate_member_count(student)
 
-        calculate_member_count(student)
-        return render_template('query-student.html', form=form, student=student, a=session.get('member_count'))
+        def find_partner(student):
+            if student.role == '学员':
+                user = student.referrer
+                student = Student.query.filter_by(name=user).first()
+                find_partner(student)
+            elif student.role == '合伙人':
+                return student.name
+            else:
+                return None
+        student_partner = find_partner(student)
+        return render_template('query-student.html', form=form, student=student, a=session.get('member_count'), student_partner=student_partner)
     return render_template('query-student.html', form=form)
 
 
