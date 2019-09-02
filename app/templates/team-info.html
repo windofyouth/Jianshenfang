@@ -2,19 +2,20 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-<h1>概要信息</h1>
+<h1>团队信息</h1>
 
 <div class="page-header" xmlns="http://www.w3.org/1999/html">
     <ul>
-    {% for team in teams %}
-        <li><a href="{{url_for('main.team_info', teamname=team.leader)}}">{{team.leader}}</a></li>
-    {% endfor %}
+        <li>团队领导:{{teamname}}</li>
+        <li>成员数量:{{student_number}}</li>
+        <li>合伙人数量:{{partner_number}}</li>
     </ul>
 </div>
 <div>
+    合伙人：
     <ul>
         {% for partner in partners %}
-        <li>{{partner.name}}</li>
+            <li>{{partner.name}}</li>
         {% endfor %}
     </ul>
 </div>

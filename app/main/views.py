@@ -10,7 +10,8 @@ from sqlalchemy import or_
 @main.route('/')
 def index():
     teams = Team.query.all()
-    return render_template('index.html', teams=teams)
+    partners = Student.query.filter_by(role='合伙人').all()
+    return render_template('index.html', teams=teams, partners=partners)
 
 
 @main.route('/add-student', methods=['GET', 'POST'])
@@ -165,6 +166,7 @@ def query_team():
         team = Team.query.filter_by(leader=form.leader.data).first()
         if team is None:
             flash('此团队不存在.')
+            return redirect(url_for('main.index'))
         partners = Student.query.filter_by(team=team).filter_by(role='合伙人').all()
         students = Student.query.filter_by(team=team).all()
         partner_number = len(partners)
@@ -179,6 +181,19 @@ def query_team():
                                partner_number=partner_number,
                                student_number=student_number)
     return render_template('query-team.html', form=form)
+
+
+@main.route('/team-info/<teamname>', methods=['GET', 'POST'])
+def team_info(teamname):
+    team = Team.query.filter_by(leader=teamname).first()
+    if team is None:
+        flash('此团队不存在.')
+        return redirect(url_for('main.index'))
+    students = Student.query.filter_by(team=team).all()
+    partners = Student.query.filter_by(team=team).filter_by(role='合伙人').all()
+    partner_number = len(partners)
+    student_number = len(students)
+    return render_template('team-info.html', partner_number=partner_number, student_number=student_number, teamname=teamname, partners=partners)
 
 
 @main.route('/change-name/<name>', methods=['GET', 'POST'])
