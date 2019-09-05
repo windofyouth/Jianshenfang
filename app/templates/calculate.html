@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<h1>提成计算器</h1>
+<div>
+    {{ wtf.quick_form(form) }}
+</div>
+<div class="page-header" xmlns="http://www.w3.org/1999/html">
+    {% if partner %}
+    <H1>{{partner.name}}分成：{{partner_money}}</H1>
+    {% endif %}
+    {% if leader %}
+    <H2>{{leader}}分成：{{leader_money}}</H2>
+    {% endif %}
+</div>
+{% endblock %}

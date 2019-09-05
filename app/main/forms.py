@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField
+from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField
 from wtforms.validators import DataRequired, Length
 from wtforms import ValidationError
 from ..models import Student
@@ -43,3 +43,14 @@ class ChangeStudentNameForm(FlaskForm):
         if Student.query.filter_by(name=field.data).first():
             raise ValidationError('此姓名已经存在')
 
+
+class CalculateForm(FlaskForm):
+    name = StringField('学员姓名:', validators=[DataRequired(), Length(1, 64)])
+    student_money = FloatField('学员费用:', validators=[DataRequired()])
+    partner_percent = FloatField('合伙人分成百分比:', validators=[DataRequired()])
+    leader_percent = FloatField('团队领导分成百分比:', validators=[DataRequired()])
+    submit = SubmitField('计算提成')
+
+    def validate_name(self, field):
+        if Student.query.filter_by(name=field.data).first() is None:
+            raise ValidationError('不存在此学员')

@@ -5,6 +5,7 @@
 <h1>概要信息</h1>
 
 <div class="page-header" xmlns="http://www.w3.org/1999/html">
+    所有团队
     <ul>
     {% for team in teams %}
         <li><a href="{{url_for('main.team_info', teamname=team.leader)}}">{{team.leader}}</a></li>
@@ -12,9 +13,20 @@
     </ul>
 </div>
 <div>
+    所有合伙人
     <ul>
         {% for partner in partners %}
         <li>{{partner.name}}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div>
+    所有学员
+    <ul>
+        {% for team in teams %}
+            {% for student in team.students %}
+                <li>{{student.name}}</li>
+            {% endfor%}
         {% endfor %}
     </ul>
 </div>

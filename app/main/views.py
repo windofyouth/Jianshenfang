@@ -1,4 +1,4 @@
-from .forms import AddStudentForm, QueryStudentForm, QueryTeamForm, ChangeStudentNameForm
+from .forms import AddStudentForm, QueryStudentForm, QueryTeamForm, ChangeStudentNameForm, CalculateForm
 from . import main
 from ..models import Student, Team
 from flask import flash, render_template, redirect, url_for, session
@@ -217,3 +217,27 @@ def change_name(name):
         flash('修改成功！')
     form.name.data = name
     return render_template('change-name.html', form=form, name=name)
+
+
+@main.route('/calculate', methods=['GET', 'POST'])
+def calculate():
+    form = CalculateForm()
+    if form.validate_on_submit():
+        session['partner_money'] = None
+        student = Student.query.filter_by(name=form.name.data).first()
+        partner = Student.query.filter_by(name=student.referrer, role='合伙人').first()
+        leader = student.team.leader
+        if partner is None:
+            flash('此学员上级还没有合伙人')
+            # return redirect(url_for('main.calculate'))
+        else:
+            session['partner_money'] = form.student_money.data * form.partner_percent.data * 0.01
+        leader_money = form.student_money.data * form.leader_percent.data * 0.01
+        return render_template('calculate.html',
+                               form=form,
+                               partner=partner,
+                               leader=leader,
+                               partner_money=session.get('partner_money'),
+                               leader_money=leader_money)
+    return render_template('calculate.html', form=form)
+
