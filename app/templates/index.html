@@ -2,6 +2,14 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
+<style>
+    #a ul{width:1000px}
+    #a li{
+        float:left;
+        margin-left: 10px;
+        list-style-type: none;
+    }
+</style>
 <h1>概要信息</h1>
 
 <div class="page-header" xmlns="http://www.w3.org/1999/html">
@@ -20,12 +28,12 @@
         {% endfor %}
     </ul>
 </div>
-<div>
+<div id="a">
     所有学员
     <ul>
         {% for team in teams %}
             {% for student in team.students %}
-                <li>{{student.name}}</li>
+                <li>{{student.name}}&nbsp;&nbsp;</li>
             {% endfor%}
         {% endfor %}
     </ul>

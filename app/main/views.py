@@ -20,10 +20,10 @@ def add_student():
 
     # 在没有任何数据的时候，添加第一个创始人
     if Student.query.count() == 0:
-        team = Team(leader='王申华')
-        student = Student(name='王申华',
+        team = Team(leader='创始人')
+        student = Student(name='创始人',
                           role='团队领导',
-                          referrer='王申华'
+                          referrer='创始人'
                           )
         student.team = team
         db.session.add(student)
@@ -70,7 +70,7 @@ def add_student():
         # 判断学员引荐人是否提升为合伙人（partner）
         # 设置时间，在此时间内引荐足够的人数成为合伙人
         threemonthtime = student.timestamp - timedelta(hours=1)
-        if referrer.name != '王申华' and \
+        if referrer.name != '创始人' and \
                 Student.query.filter(Student.referrer == referrer.name,
                                      Student.timestamp > threemonthtime).count() == 3:
             referrer.role = '合伙人'
@@ -79,7 +79,7 @@ def add_student():
             db.session.commit()
             session['referrer_yes'] = True
         # 判断引荐人的引荐人是否提升为团队领导（leader）
-        if referrer.name != '王申华' and \
+        if referrer.name != '创始人' and \
                 Student.query.filter_by(referrer=referrer_referrer.name, role='合伙人').count() == 2 and \
                 referrer_referrer.role != '团队领导':
             referrer_referrer.role = '团队领导'
@@ -140,7 +140,7 @@ def query_student():
                 session['member_count'] = session['member_count'] + query.count()
                 for student in students:
                     calculate_member_count(student, member_count=member_count)
-        if student.name == '王申华':
+        if student.name == '创始人':
             session['member_count'] = Student.query.count() - 1
         else:
             calculate_member_count(student)
@@ -224,20 +224,22 @@ def calculate():
     form = CalculateForm()
     if form.validate_on_submit():
         session['partner_money'] = None
+        session['leader_money'] = None
         student = Student.query.filter_by(name=form.name.data).first()
         partner = Student.query.filter_by(name=student.referrer, role='合伙人').first()
         leader = student.team.leader
         if partner is None:
             flash('此学员上级还没有合伙人')
             # return redirect(url_for('main.calculate'))
+            session['leader_money'] = form.student_money.data * (form.leader_percent.data + form.partner_percent.data) * 0.01
         else:
             session['partner_money'] = form.student_money.data * form.partner_percent.data * 0.01
-        leader_money = form.student_money.data * form.leader_percent.data * 0.01
+            session['leader_money'] = form.student_money.data * form.leader_percent.data * 0.01
         return render_template('calculate.html',
                                form=form,
                                partner=partner,
                                leader=leader,
                                partner_money=session.get('partner_money'),
-                               leader_money=leader_money)
+                               leader_money=session['leader_money'])
     return render_template('calculate.html', form=form)
 
