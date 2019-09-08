@@ -69,10 +69,12 @@ def add_student():
         db.session.commit()
         # 判断学员引荐人是否提升为合伙人（partner）
         # 设置时间，在此时间内引荐足够的人数成为合伙人
-        threemonthtime = student.timestamp - timedelta(hours=1)
+        # threemonthtime = student.timestamp - timedelta(hours=1)
+        # if referrer.name != '创始人' and \
+        #         Student.query.filter(Student.referrer == referrer.name,
+        #                              Student.timestamp > threemonthtime).count() == 3:
         if referrer.name != '创始人' and \
-                Student.query.filter(Student.referrer == referrer.name,
-                                     Student.timestamp > threemonthtime).count() == 3:
+                Student.query.filter(Student.referrer == referrer.name).count() == 10:
             referrer.role = '合伙人'
             session['referrer_name'] = referrer.name
             db.session.add(referrer)
@@ -80,7 +82,7 @@ def add_student():
             session['referrer_yes'] = True
         # 判断引荐人的引荐人是否提升为团队领导（leader）
         if referrer.name != '创始人' and \
-                Student.query.filter_by(referrer=referrer_referrer.name, role='合伙人').count() == 2 and \
+                Student.query.filter_by(referrer=referrer_referrer.name, role='合伙人').count() == 3 and \
                 referrer_referrer.role != '团队领导':
             referrer_referrer.role = '团队领导'
             session['referrer_referrer_name'] = referrer_referrer.name

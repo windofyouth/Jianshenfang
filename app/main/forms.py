@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange
 from wtforms import ValidationError
 from ..models import Student
 
@@ -46,9 +46,9 @@ class ChangeStudentNameForm(FlaskForm):
 
 class CalculateForm(FlaskForm):
     name = StringField('学员姓名:', validators=[DataRequired(), Length(1, 64)])
-    student_money = FloatField('学员费用:', validators=[DataRequired()])
-    partner_percent = FloatField('合伙人分成百分比:', validators=[DataRequired()])
-    leader_percent = FloatField('团队领导分成百分比:', validators=[DataRequired()])
+    student_money = FloatField('学员费用:', validators=[DataRequired('请输入数字')])
+    partner_percent = FloatField('合伙人分成百分比:', validators=[DataRequired('请输入数字'), NumberRange(1, 100, '必须是介于1到100之间的数字')])
+    leader_percent = FloatField('团队领导分成百分比:', validators=[DataRequired('请输入数字'), NumberRange(1, 100, '必须是介于1到100之间的数字')])
     submit = SubmitField('计算提成')
 
     def validate_name(self, field):
