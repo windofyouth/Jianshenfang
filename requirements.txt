@@ -1,4 +1,4 @@
-aiohttp==2.2.5
+aiohttp==3.7.4
 aiomysql==0.0.9
 alembic==0.9.3
 async-timeout==1.4.0
